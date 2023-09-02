@@ -3,7 +3,6 @@
 import sys
 
 def nqueens(n: int):
-
     matrix = [[0 for x in range(n)] for y in range(n)]
     print(str(matrix))
 
