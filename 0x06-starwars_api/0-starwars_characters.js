@@ -1,43 +1,20 @@
-const request = require('request');
+!/usr/bin/node
+const util = require('util');
+const request = util.promisify(require('request'));
+const filmID = process.argv[2];
 
-// Function to fetch characters from the Star Wars API for a specific movie
-function getCharacters(movieId) {
-  const apiUrl = `https://swapi-api.alx-tools.com/api/films/${movieId}/`;
-  
-  request(apiUrl, (error, response, body) => {
-    if (!error && response.statusCode === 200) {
-      const filmData = JSON.parse(body);
-      const characters = filmData.characters;
+async function starwarsCharacters (filmId) {
+  const endpoint = 'https://swapi-api.alx-tools.com/api/films/' + filmId;
+  let response = await (await request(endpoint)).body;
+  response = JSON.parse(response);
+  const characters = response.characters;
 
-      console.log(`Characters in ${filmData.title}:`);
-      
-      // Function to print characters one by one
-      function printCharacters(index) {
-        if (index < characters.length) {
-          request(characters[index], (error, response, characterData) => {
-            if (!error && response.statusCode === 200) {
-              const character = JSON.parse(characterData);
-              console.log(character.name);
-              printCharacters(index + 1);
-            } else {
-              console.error(`Error fetching character data: ${error}`);
-            }
-          });
-        }
-      }
-
-      printCharacters(0);
-    } else {
-      console.error(`Error fetching movie data: ${error}`);
-    }
-  });
+  for (let i = 0; i < characters.length; i++) {
+    const urlCharacter = characters[i];
+    let character = await (await request(urlCharacter)).body;
+    character = JSON.parse(character);
+    console.log(character.name);
+  }
 }
 
-// Usage: Pass the Movie ID as a command-line argument (e.g., 3 for "Return of the Jedi")
-const movieId = process.argv[2];
-
-if (!movieId) {
-  console.error("Please provide a valid Movie ID as a command-line argument.");
-} else {
-  getCharacters(movieId);
-}
+starwarsCharacters(filmID);
