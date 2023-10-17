@@ -85,4 +85,4 @@ if __name__ == "__main__":
     matrix = build_matrix(5)
 
     rotate_2d_matrix(matrix)
-    printx(matrix)
+    print(matrix)
